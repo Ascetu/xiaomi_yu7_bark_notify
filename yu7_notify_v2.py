@@ -81,7 +81,8 @@ def get_order_detail(orderId, userId, Cookie):
         "Cookie": Cookie,
     }
 
-    response = requests.post(url, json=payload, headers=headers, timeout=15)
+    # response = requests.post(url, json=payload, headers=headers, timeout=15)
+    response = requests.post(url, data=json.dumps(payload), headers=headers)
 
     logger.warning("========== 接口请求调试信息 ==========")
     logger.warning(f"HTTP Status: {response.status_code}")
