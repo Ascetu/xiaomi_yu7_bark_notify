@@ -160,7 +160,7 @@ if __name__ == "__main__":
         old_delivery_time,
         remarks,
         error_times,
-    ) = load_config(args)
+    ) = load_config()
 
     try:
         result = get_order_detail(orderId, userId, Cookie)
