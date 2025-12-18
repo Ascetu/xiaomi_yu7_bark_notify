@@ -6,7 +6,8 @@ carshopCookie = ""
 deviceToken = ""
 
 [notice]
-deliveryTimeLatest = "请检查account参数是否正确！"
+deliveryTimeLatest = "锁定订单后预计36-39周交付，预计还需12-15周"
 carshopNotice = ""
 remarks = "--来自Github Action"
-errorTimes = 1
+errorTimes = 0
+orderStatus = 2520
