@@ -187,6 +187,14 @@ if __name__ == "__main__":
         error_times,
     ) = load_config()
 
+    # ===== 命令行参数优先覆盖 =====
+    if args.orderId:
+        orderId = args.orderId
+    if args.userId:
+        userId = args.userId
+    if args.cookie:
+        Cookie = args.cookie
+
     try:
         logger.warning("========== 参数校验 ==========")
         logger.warning(f"orderId: {orderId}")
