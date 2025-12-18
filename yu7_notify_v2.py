@@ -89,7 +89,23 @@ def get_order_detail(orderId, userId, Cookie):
 
     response = requests.post(url, data=json.dumps(payload), headers=headers)
 
-    data = response.json().get("data", {})
+    try:
+        resp_json = response.json()
+    except Exception:
+        logger.error("接口返回不是 JSON")
+        logger.error(response.text)
+        sys.exit(1)
+    
+    # 🔴 核心：完整打印返回结构
+    logger.warning("接口返回 JSON：")
+    logger.warning(json.dumps(resp_json, ensure_ascii=False, indent=2))
+
+    data = resp_json.get("data")
+
+    if not data:
+        logger.error("接口返回 data 为空，可能 Cookie 失效或接口变更")
+        sys.exit(1)
+    
     logo_link = data.get("backdropPictures", {}).get("backdropPicture", None)
     statusInfo = data.get("statusInfo", {})
     vid = data.get("buyCarInfo", {}).get("vid", "")
