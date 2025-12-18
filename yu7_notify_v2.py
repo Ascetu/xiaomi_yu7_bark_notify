@@ -72,8 +72,8 @@ def vid_status_mapping(vid: str):
 # =====================
 def get_order_detail(orderId, userId, Cookie):
     url = "https://api.retail.xiaomiev.com/mtop/car-order/order/detail"
-    payload = [{"orderId": orderId, "userId": userId}]
 
+    payload = [{"orderId": orderId, "userId": userId}]
     headers = {
         "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X)",
         "Content-Type": "application/json",
@@ -82,30 +82,55 @@ def get_order_detail(orderId, userId, Cookie):
     }
 
     response = requests.post(url, json=payload, headers=headers, timeout=15)
-    response.raise_for_status()
 
-    data = response.json().get("data", {})
+    logger.warning("========== 接口请求调试信息 ==========")
+    logger.warning(f"HTTP Status: {response.status_code}")
+
+    try:
+        resp_json = response.json()
+    except Exception:
+        logger.error("接口返回不是 JSON")
+        logger.error(response.text)
+        sys.exit(1)
+
+    # 🔴 核心：完整打印返回结构
+    logger.warning("接口返回 JSON：")
+    logger.warning(json.dumps(resp_json, ensure_ascii=False, indent=2))
+
+    data = resp_json.get("data")
+
+    if not data:
+        logger.error("接口返回 data 为空，可能 Cookie 失效或接口变更")
+        sys.exit(1)
+
+    # ===== 正常解析 =====
     statusInfo = data.get("statusInfo", {})
     orderTimeInfo = data.get("orderTimeInfo", {})
     buyCarInfo = data.get("buyCarInfo", {})
 
-    delivery_time = orderTimeInfo.get("deliveryTime", "")
-    lock_time = orderTimeInfo.get("lockTime", "")
+    order_status_name = statusInfo.get("orderStatusName")
+    order_status = statusInfo.get("orderStatus")
+    vid = buyCarInfo.get("vid", "")
+    delivery_time = orderTimeInfo.get("deliveryTime")
+    add_time = orderTimeInfo.get("addTime")
+    pay_time = orderTimeInfo.get("payTime")
+    lock_time = orderTimeInfo.get("lockTime")
+
+    goods_names = " | ".join(
+        item.get("goodsName", "") for item in data.get("orderItem", [])
+    )
 
     return {
-        "order_status": statusInfo.get("orderStatus"),
-        "order_status_name": statusInfo.get("orderStatusName"),
+        "order_status_name": order_status_name,
+        "order_status": order_status,
+        "vid": vid,
         "delivery_time": delivery_time,
-        "delivery_range": calculate_delivery_date(delivery_time, lock_time),
-        "add_time": orderTimeInfo.get("addTime"),
-        "pay_time": orderTimeInfo.get("payTime"),
+        "add_time": add_time,
+        "pay_time": pay_time,
         "lock_time": lock_time,
-        "vid": buyCarInfo.get("vid", ""),
-        "vid_status": vid_status_mapping(buyCarInfo.get("vid", "")),
-        "goods": " | ".join(
-            item.get("goodsName", "") for item in data.get("orderItem", [])
-        ),
+        "goods_names": goods_names,
     }
+
 
 # =====================
 # 保存状态
