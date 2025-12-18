@@ -191,11 +191,13 @@ def log_result(result: dict):
 # 主逻辑
 # =====================
 def main():
-    if result["delivery_time"] != old_delivery_time:
-        save_config(result["delivery_time"], result["order_status"])
-        log_result(result)
-    else:
-        logger.warning("交付时间无变化，未输出新结果")
+    # if result["delivery_time"] != old_delivery_time:
+    #     save_config(result["delivery_time"], result["order_status"])
+    #     log_result(result)
+    # else:
+    #     logger.warning("交付时间无变化，未输出新结果")
+    save_config(result["delivery_time"], result["order_status"])
+    log_result(result)
 
 # =====================
 # 启动入口
