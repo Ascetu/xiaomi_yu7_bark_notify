@@ -98,7 +98,7 @@ def get_order_detail(orderId, userId, Cookie):
     
     # 🔴 核心：完整打印返回结构
     logger.warning("接口返回 JSON：")
-    logger.warning(json.dumps(resp_json, ensure_ascii=False, indent=2))
+    # logger.warning(json.dumps(resp_json, ensure_ascii=False, indent=2))
 
     data = resp_json.get("data")
 
