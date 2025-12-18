@@ -145,7 +145,20 @@ def get_order_detail(orderId, userId, Cookie):
     text = f"{delivery_date_range}\n\n📅 下定时间：{add_time}\n💳 支付时间：{pay_time}\n🔒 锁单时间：{lock_time}\n\n🛍️ 配置：{goods_names}\n\n{vid_text}\n\n{remarks_text}"
     # print(text)
 
-    return delivery_time, order_status, text, order_status_name, logo_link, vid
+    return {
+        "delivery_time": delivery_time,
+        "order_status": order_status,
+        "order_status_name": order_status_name,
+        "message": text,
+        "logo_link": logo_link,
+        "vid": vid,
+        "vid_status": vid_status_mapping(str(vid)),
+        "delivery_range": calculate_delivery_date(delivery_time, lock_time),
+        "add_time": add_time,
+        "pay_time": pay_time,
+        "lock_time": lock_time,
+        "goods": goods_names,
+    }
 
 
 # =====================
