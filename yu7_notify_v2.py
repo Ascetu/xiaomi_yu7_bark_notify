@@ -74,63 +74,62 @@ def get_order_detail(orderId, userId, Cookie):
     url = "https://api.retail.xiaomiev.com/mtop/car-order/order/detail"
 
     payload = [{"orderId": orderId, "userId": userId}]
+
     headers = {
-        "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X)",
+        "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 MicroMessenger/8.0.60(0x18003c31) NetType/4G Language/zh_CN",
+        "Accept-Encoding": "gzip,compress,br,deflate",
         "Content-Type": "application/json",
+        "configSelectorVersion": "2",
+        "content-type": "application/json; charset=utf-8",
+        "deviceappversion": "1.16.0",
+        "x-user-agent": "channel/car platform/car.wxlite",
         "Referer": "https://servicewechat.com/wx183d85f5e5e273c6/93/page-frame.html",
         "Cookie": Cookie,
     }
 
-    # response = requests.post(url, json=payload, headers=headers, timeout=15)
     response = requests.post(url, data=json.dumps(payload), headers=headers)
 
-    logger.warning("========== 接口请求调试信息 ==========")
-    logger.warning(f"HTTP Status: {response.status_code}")
-
-    try:
-        resp_json = response.json()
-    except Exception:
-        logger.error("接口返回不是 JSON")
-        logger.error(response.text)
-        sys.exit(1)
-
-    # 🔴 核心：完整打印返回结构
-    logger.warning("接口返回 JSON：")
-    logger.warning(json.dumps(resp_json, ensure_ascii=False, indent=2))
-
-    data = resp_json.get("data")
-
-    if not data:
-        logger.error("接口返回 data 为空，可能 Cookie 失效或接口变更")
-        sys.exit(1)
-
-    # ===== 正常解析 =====
+    data = response.json().get("data", {})
+    logo_link = data.get("backdropPictures", {}).get("backdropPicture", None)
     statusInfo = data.get("statusInfo", {})
+    vid = data.get("buyCarInfo", {}).get("vid", "")
     orderTimeInfo = data.get("orderTimeInfo", {})
-    buyCarInfo = data.get("buyCarInfo", {})
 
-    order_status_name = statusInfo.get("orderStatusName")
+    order_status_name = statusInfo.get("orderStatusName", None)
     order_status = statusInfo.get("orderStatus")
-    vid = buyCarInfo.get("vid", "")
     delivery_time = orderTimeInfo.get("deliveryTime")
+
+    vid_text = f"🛠️ vid：{vid}【{vid_status_mapping(str(vid))}】"
+    remarks_text = " " * 50 + remarks
+
+    if not delivery_time:
+        delivery_time = "请检查account参数是否正确！"
+        error_times_update = error_times + 1
+
+        message = f"{delivery_time}\n\n失败次数：{error_times_update}\norderId：{orderId}\nuserId：{userId}\nCookie：{Cookie}\n【失败次数超过3次后将停止发送】\n\n{remarks_text}\n\n{order_status}"
+
+        save_config(
+            delivery_time,
+            order_status,
+            carshop_notice=carshop_notice,
+            error_times=error_times_update,
+        )
+        if error_times_update <= 3:
+            send_bark_message(device_token, message, orderStatusName="account参数错误")
+
+        logger.warning(delivery_time)
+        sys.exit()
     add_time = orderTimeInfo.get("addTime")
     pay_time = orderTimeInfo.get("payTime")
     lock_time = orderTimeInfo.get("lockTime")
-
     goods_names = " | ".join(
         item.get("goodsName", "") for item in data.get("orderItem", [])
     )
+    delivery_date_range = calculate_delivery_date(delivery_time, lock_time)
+    text = f"{delivery_date_range}\n\n📅 下定时间：{add_time}\n💳 支付时间：{pay_time}\n🔒 锁单时间：{lock_time}\n\n🛍️ 配置：{goods_names}\n\n{vid_text}\n\n{remarks_text}"
+    # print(text)
 
-    return {
-        "order_status_name": order_status_name,
-        "order_status": order_status,
-        "vid": vid,
-        "delivery_time": delivery_time,
-        "add_time": add_time,
-        "pay_time": pay_time,
-        "lock_time": lock_time,
-        "goods_names": goods_names,
-    }
+    return delivery_time, order_status, text, order_status_name, logo_link, vid
 
 
 # =====================
@@ -198,12 +197,13 @@ if __name__ == "__main__":
 
     try:
         logger.warning("========== 参数校验 ==========")
-        logger.warning(f"orderId: {orderId}")
-        logger.warning(f"userId: {userId}")
+        logger.warning(f"orderId: {orderId[:5]}")
+        logger.warning(f"userId: {userId[:5]}")
         logger.warning(f"Cookie 是否存在: {'是' if Cookie else '否'}")
         if Cookie:
             logger.warning(f"Cookie 前 20 字符: {Cookie[:20]}...")
 
+        # delivery_time, order_status, message, order_status_name, logo_link, vid = get_order_detail(orderId, userId, Cookie)
         result = get_order_detail(orderId, userId, Cookie)
         main()
     except Exception as e:
