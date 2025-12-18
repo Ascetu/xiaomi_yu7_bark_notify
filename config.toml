@@ -6,7 +6,7 @@ carshopCookie = ""
 deviceToken = ""
 
 [notice]
-deliveryTimeLatest = ""
+deliveryTimeLatest = "请检查account参数是否正确！"
 carshopNotice = ""
 remarks = "--来自Github Action"
-errorTimes = 0
+errorTimes = 1
