@@ -147,8 +147,11 @@ def main():
 # 启动入口
 # =====================
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.parse_args()
+    parser = argparse.ArgumentParser(description="小米汽车订单状态查询")
+    parser.add_argument("--orderId", type=str)
+    parser.add_argument("--userId", type=str)
+    parser.add_argument("--cookie", type=str)
+    args = parser.parse_args()
 
     (
         orderId,
@@ -157,7 +160,7 @@ if __name__ == "__main__":
         old_delivery_time,
         remarks,
         error_times,
-    ) = load_config()
+    ) = load_config(args)
 
     try:
         result = get_order_detail(orderId, userId, Cookie)
