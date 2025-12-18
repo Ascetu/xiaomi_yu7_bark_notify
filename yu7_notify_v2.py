@@ -114,8 +114,8 @@ def get_order_detail(orderId, userId, Cookie):
             # carshop_notice=carshop_notice,
             error_times=error_times_update,
         )
-        if error_times_update <= 3:
-            send_bark_message(device_token, message, orderStatusName="account参数错误")
+        # if error_times_update <= 3:
+        #     send_bark_message(device_token, message, orderStatusName="account参数错误")
 
         logger.warning(delivery_time)
         sys.exit()
