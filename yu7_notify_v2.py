@@ -188,6 +188,13 @@ if __name__ == "__main__":
     ) = load_config()
 
     try:
+        logger.warning("========== 参数校验 ==========")
+        logger.warning(f"orderId: {orderId}")
+        logger.warning(f"userId: {userId}")
+        logger.warning(f"Cookie 是否存在: {'是' if Cookie else '否'}")
+        if Cookie:
+            logger.warning(f"Cookie 前 20 字符: {Cookie[:20]}...")
+
         result = get_order_detail(orderId, userId, Cookie)
         main()
     except Exception as e:
