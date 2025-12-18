@@ -111,7 +111,7 @@ def get_order_detail(orderId, userId, Cookie):
         save_config(
             delivery_time,
             order_status,
-            carshop_notice=carshop_notice,
+            # carshop_notice=carshop_notice,
             error_times=error_times_update,
         )
         if error_times_update <= 3:
