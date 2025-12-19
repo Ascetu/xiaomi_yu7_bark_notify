@@ -64,11 +64,7 @@ def request_inventory(cookie: str) -> dict:
     if resp.status_code != 200:
         raise RuntimeError(f"HTTP 请求失败，状态码：{resp.status_code}")
 
-    data = resp.json()
-    if data.get("code") != 0:
-        raise RuntimeError(f"接口返回异常：{data}")
-
-    return data.get("data", {})
+    return resp.json()
 
 
 def match_ssu_info(ssu_info: str) -> bool:
@@ -90,9 +86,25 @@ def main():
     logger.warning("========== 库存接口查询开始 ==========")
 
     try:
-        data = request_inventory(args.cookie)
+        resp_json = request_inventory(args.cookie)
     except Exception as e:
         logger.error(f"接口请求失败：{e}")
+        sys.exit(1)
+
+    # 🔍 新增：接口返回校验日志
+    code = resp_json.get("code")
+    message = resp_json.get("message")
+    data = resp_json.get("data", {})
+    total = data.get("total")
+
+    logger.warning("========== 接口返回校验 ==========")
+    logger.warning(f"code: {code}")
+    logger.warning(f"message: {message}")
+    logger.warning(f"total: {total}")
+    logger.warning("=================================")
+
+    if code != 0:
+        logger.error("接口返回非成功状态，终止执行")
         sys.exit(1)
 
     items = data.get("items", [])
