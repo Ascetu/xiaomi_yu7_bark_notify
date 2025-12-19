@@ -44,8 +44,8 @@ PAYLOAD = [{
         "stockType": "all",
         "itemType": "500015457",
         "sortType": "priceAsc",
-        # "carSsuId": "600019694",
-        "carSsuId": "600019693",
+        "carSsuId": "600019694",
+        # "carSsuId": "600019693",
         "saleConfigFilterList": []
     },
     "pageNo": 1,
@@ -91,8 +91,8 @@ def match_ssu_info(ssu_info: str) -> bool:
     color_ok = "深海蓝" in ssu_info
     wheel_ok = ("幻刃轮毂" in ssu_info) or ("锻造梅花轮毂" in ssu_info)
     audio_ok = "豪华音响" in ssu_info
-    # interior_ok = ("松石灰" in ssu_info) or ("鸢尾紫" in ssu_info) or ("珊瑚橙" in ssu_info)
-    interior_ok = ("松石灰" in ssu_info) or ("鸢尾紫" in ssu_info)
+    interior_ok = ("松石灰" in ssu_info) or ("鸢尾紫" in ssu_info) or ("珊瑚橙" in ssu_info)
+    # interior_ok = ("松石灰" in ssu_info) or ("鸢尾紫" in ssu_info)
 
     return color_ok and wheel_ok and audio_ok and interior_ok
 
@@ -168,7 +168,7 @@ def main():
     ]
 
     for step in sleep_steps:
-        time.sleep(step)
+        time.sleep(5)
         now = datetime.now()
 
         # 判断是否在触发窗口
