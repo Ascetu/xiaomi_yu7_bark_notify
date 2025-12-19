@@ -45,7 +45,7 @@ PAYLOAD = [{
         "saleConfigFilterList": []
     },
     "pageNo": 1,
-    "pageSize": 10
+    "pageSize": 200
 }]
 
 
