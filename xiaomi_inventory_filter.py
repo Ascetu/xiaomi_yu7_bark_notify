@@ -23,16 +23,29 @@ HEADERS_TEMPLATE = {
 }
 
 
+# PAYLOAD = [{
+#     "source": "wx",
+#     "inventoryChannel": "NORMAL",
+#     "conditions": {
+#         "stockType": "all",
+#         "itemType": "500015457",
+#         "sortType": "priceAsc"
+#     },
+#     "pageNo": 1,
+#     "pageSize": 200
+# }]
 PAYLOAD = [{
     "source": "wx",
     "inventoryChannel": "NORMAL",
     "conditions": {
         "stockType": "all",
         "itemType": "500015457",
-        "sortType": "priceAsc"
+        "sortType": "priceAsc",
+        "carSsuId": "600019694",
+        "saleConfigFilterList": []
     },
     "pageNo": 1,
-    "pageSize": 200
+    "pageSize": 10
 }]
 
 
