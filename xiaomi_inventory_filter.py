@@ -32,7 +32,7 @@ PAYLOAD = [{
         "sortType": "priceAsc"
     },
     "pageNo": 1,
-    "pageSize": 10
+    "pageSize": 200
 }]
 
 
@@ -75,7 +75,7 @@ def match_ssu_info(ssu_info: str) -> bool:
     if not ssu_info:
         return False
 
-    color_ok = "钛金属" in ssu_info
+    color_ok = "深海蓝" in ssu_info
     wheel_ok = ("幻刃轮毂" in ssu_info) or ("锻造梅花轮毂" in ssu_info)
     audio_ok = "豪华音响" in ssu_info
     interior_ok = ("松石灰" in ssu_info) or ("鸢尾紫" in ssu_info)
