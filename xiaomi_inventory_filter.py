@@ -176,7 +176,7 @@ def main():
         if hit_window:
             query_inventory(args.cookie, logger)
             logger.warning(f"精准触发时间：{now}, 退出循环")
-            break  # 一旦命中立即退出循环
+            continue  # 一旦命中立即退出循环xxx不对，应该是命中后继续循环，指导下一次没命中
         else:
             logger.warning(f"当前时间 {now} 不在触发窗口，继续 sleep")
 
