@@ -1,4 +1,4 @@
-name: Run Notify Sync V2
+name: xiaomi inventory filter
 
 on:
   workflow_dispatch:
