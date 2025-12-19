@@ -2,9 +2,9 @@ import argparse
 import json
 import logging
 import sys
-import requests
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
+import requests
 
 API_URL = "https://api.retail.xiaomiev.com/mtop/guidemarketing/product/car/inventory/list"
 
@@ -25,6 +25,7 @@ HEADERS_TEMPLATE = {
 }
 
 
+# PAYLOAD 测试与生产版本都保留
 # PAYLOAD = [{
 #     "source": "wx",
 #     "inventoryChannel": "NORMAL",
@@ -96,15 +97,15 @@ def match_ssu_info(ssu_info: str) -> bool:
     return color_ok and wheel_ok and audio_ok and interior_ok
 
 
-def query_inventory(cookie, logger):
-    """执行一次接口请求并输出匹配结果"""
+def query_inventory(cookie: str, logger):
+    logger.warning("========== 库存接口查询开始 ==========")
     try:
         resp_json = request_inventory(cookie)
     except Exception as e:
         logger.error(f"接口请求失败：{e}")
-        return False
+        sys.exit(1)
 
-    # 接口返回校验日志
+    # 🔍 接口返回校验日志
     code = resp_json.get("code")
     message = resp_json.get("message")
     data = resp_json.get("data", {})
@@ -116,17 +117,16 @@ def query_inventory(cookie, logger):
     logger.warning(f"total: {total}")
     logger.warning("=================================")
 
-    if code != 0 or not data:
-        logger.error("接口返回非成功状态或 data 为空")
-        return False
+    if code != 0:
+        logger.error("接口返回非成功状态，终止执行")
+        sys.exit(1)
 
     items = data.get("items", [])
     if not items:
         logger.warning("接口返回 items 为空")
-        return False
+        return False  # 未命中
 
     matched = []
-
     for item in items:
         ssu_info = item.get("ssuInfo", "")
         if match_ssu_info(ssu_info):
@@ -153,33 +153,32 @@ def main():
     logger = setup_logger()
     args = parse_args()
 
-    # 循环 sleep 时间序列（秒）
-    sleep_times = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 65]
+    # 循环 sleep 步长（秒）
+    sleep_steps = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60]
 
-    logger.warning("========== 库存接口查询循环开始 ==========")
+    # 精准触发窗口 ±5秒
+    tolerance = timedelta(seconds=5)
 
-    start_time = datetime.now()
+    # 目标触发时间（今天 11:00 和 23:00）
+    now = datetime.now()
+    today = now.date()
+    target_times = [
+        datetime(today.year, today.month, today.day, 11, 0, 0),
+        datetime(today.year, today.month, today.day, 23, 0, 0)
+    ]
 
-    for idx, s in enumerate(sleep_times):
-        if idx > 0:
-            time.sleep(s - sleep_times[idx - 1])
-
+    for step in sleep_steps:
+        time.sleep(step)
         now = datetime.now()
-        hour = now.hour
-        minute = now.minute
 
-        # 严格判断当前时间窗口，只执行刷新窗口前
-        if (hour == 11 or hour == 23) or (hour == 10 or hour == 22):
-            hit = query_inventory(args.cookie, logger)
-            if hit:
-                logger.warning(f"命中刷新窗口，退出循环，当前时间：{now}")
-                break
+        # 判断是否在触发窗口
+        hit_window = any(abs(now - t_target) <= tolerance for t_target in target_times)
+        if hit_window:
+            query_inventory(args.cookie, logger)
+            logger.warning(f"精准触发时间：{now}, 退出循环")
+            break  # 一旦命中立即退出循环
         else:
-            # 当前时间不在目标窗口，跳过循环
-            logger.warning(f"跳过循环，当前时间：{now}")
-            continue
-
-    logger.warning("========== 库存接口查询循环结束 ==========")
+            logger.warning(f"当前时间 {now} 不在触发窗口，继续 sleep")
 
 
 if __name__ == "__main__":
