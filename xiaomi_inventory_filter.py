@@ -163,7 +163,7 @@ def main():
     now = datetime.now()
     today = now.date()
     target_times = [
-        datetime(today.year, today.month, today.day, 11, 0, 0),
+        datetime(today.year, today.month, today.day, 18, 0, 0),
         datetime(today.year, today.month, today.day, 23, 0, 0)
     ]
 
