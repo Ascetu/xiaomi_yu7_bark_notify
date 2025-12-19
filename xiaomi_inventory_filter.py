@@ -74,7 +74,7 @@ def match_ssu_info(ssu_info: str) -> bool:
     color_ok = "深海蓝" in ssu_info
     wheel_ok = ("幻刃轮毂" in ssu_info) or ("锻造梅花轮毂" in ssu_info)
     audio_ok = "豪华音响" in ssu_info
-    interior_ok = ("松石灰" in ssu_info) or ("鸢尾紫" in ssu_info)
+    interior_ok = ("松石灰" in ssu_info) or ("鸢尾紫" in ssu_info) or ("珊瑚橙" in ssu_info)
 
     return color_ok and wheel_ok and audio_ok and interior_ok
 
