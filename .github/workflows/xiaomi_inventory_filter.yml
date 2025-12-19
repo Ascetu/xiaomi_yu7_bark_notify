@@ -3,7 +3,7 @@ name: xiaomi inventory filter
 on:
   workflow_dispatch:
   schedule:
-    - cron: '15 3,10 * * *'
+    - cron: '59 * * * *'
   push:
     branches:
       - main
