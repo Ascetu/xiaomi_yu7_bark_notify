@@ -1,0 +1,3 @@
+- name: Check Xiaomi Inventory
+  run: |
+    python xiaomi_inventory_filter.py --cookie ${{ secrets.COOKIE }}
