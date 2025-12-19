@@ -31,7 +31,6 @@ jobs:
           pip install -r requirements.txt
       - name: 获取最新交付进度
         run: |
-          # python yu7_notify_v2.py --orderId ${{ secrets.ORDERID }} --userId ${{ secrets.USERID }} --cookie ${{ secrets.COOKIE }}
           python xiaomi_inventory_filter.py --cookie ${{ secrets.COOKIE }}
       - name: 提交
         run: |
