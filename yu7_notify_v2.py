@@ -187,6 +187,58 @@ def log_result(result: dict):
     logger.warning(f"配置：{result['goods']}")
     logger.warning("=====================================")
 
+def notify_wecom(result: dict, webhook_key: str):
+    """
+    通过企业微信群机器人发送小米汽车订单状态通知
+    """
+    url = f"https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key={webhook_key}"
+
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    markdown = f"""
+    ### 🚗 小米汽车订单状态
+
+    > **订单状态**：`{result.get('order_status_name', '-')}`
+    > **VID**：`{result.get('vid', '-')}`（{result.get('vid_status', '-')}）
+    > **预计交付**：`{result.get('delivery_range', '-')}`
+
+    ---
+
+    **下定时间**：{result.get('add_time', '-')}  
+    **支付时间**：{result.get('pay_time', '-')}  
+    **锁单时间**：{result.get('lock_time', '-')}
+
+    ---
+
+    **配置详情**：
+    {result.get('goods', '-')}
+
+    pgsql
+    复制代码
+
+    > ⏱ 更新时间：`{now}`
+    """.strip()
+
+    payload = {
+        "msgtype": "markdown",
+        "markdown": {
+            "content": markdown
+        }
+    }
+
+    headers = {
+        "Content-Type": "application/json"
+    }
+
+    response = requests.post(
+        url,
+        data=json.dumps(payload, ensure_ascii=False),
+        headers=headers,
+        timeout=10
+    )
+
+    response.raise_for_status()
+
 # =====================
 # 主逻辑
 # =====================
