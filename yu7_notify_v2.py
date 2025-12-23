@@ -250,6 +250,7 @@ def main():
     #     logger.warning("交付时间无变化，未输出新结果")
     save_config(result["delivery_time"], result["order_status"])
     log_result(result)
+    notify_wecom(result,wechat_key)
 
 # =====================
 # 启动入口
@@ -259,6 +260,7 @@ if __name__ == "__main__":
     parser.add_argument("--orderId", type=str)
     parser.add_argument("--userId", type=str)
     parser.add_argument("--cookie", type=str)
+    parser.add_argument("--wechat_key", type=str)
     args = parser.parse_args()
 
     (
@@ -277,12 +279,15 @@ if __name__ == "__main__":
         userId = args.userId
     if args.cookie:
         Cookie = args.cookie
+    if args.wechat_key:
+        wechat_key = args.wechat_key
 
     try:
         logger.warning("========== 参数校验 ==========")
         logger.warning(f"orderId: {orderId[:5]}")
         logger.warning(f"userId: {userId[:5]}")
         logger.warning(f"Cookie 是否存在: {'是' if Cookie else '否'}")
+        logger.warning(f"wechat_key: {wechat_key[:5]}")
         if Cookie:
             logger.warning(f"Cookie 前 20 字符: {Cookie[:20]}...")
 
