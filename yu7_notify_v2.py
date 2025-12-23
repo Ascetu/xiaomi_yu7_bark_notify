@@ -199,22 +199,19 @@ def notify_wecom(result: dict, webhook_key: str):
     ### 🚗 小米汽车订单状态
 
     > **订单状态**：`{result.get('order_status_name', '-')}`
-    > **VID**：`{result.get('vid', '-')}`（{result.get('vid_status', '-')}）
+    > **VID**：`{result.get('vid', '-')}（{result.get('vid_status', '-')})`
     > **预计交付**：`{result.get('delivery_range', '-')}`
 
     ---
 
-    **下定时间**：{result.get('add_time', '-')}  
-    **支付时间**：{result.get('pay_time', '-')}  
-    **锁单时间**：{result.get('lock_time', '-')}
+    > **下定时间**：{result.get('add_time', '-')}  
+    > **支付时间**：{result.get('pay_time', '-')}  
+    > **锁单时间**：{result.get('lock_time', '-')}
 
     ---
 
     **配置详情**：
     {result.get('goods', '-')}
-
-    pgsql
-    复制代码
 
     > ⏱ 更新时间：`{now}`
     """.strip()
